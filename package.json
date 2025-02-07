@@ -1,0 +1,24 @@
+{
+  "name": "hackernews-cli",
+  "version": "0.0.2",
+  "description": "A command-line tool to scrape Hacker News top and newest stories",
+ "main": "src/HackNewsService.js",
+  "bin": {
+    "hackernews": "./bin/hackernews.js"
+  },
+  "scripts": {
+    "start": "node ./bin/hackernews.js"
+  },
+  "keywords": [
+    "hackernews",
+    "cli",
+    "scraper",
+    "puppeteer"
+  ],
+  "author": "AtomGradient",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^13.1.0",
+    "puppeteer": "^24.2.0"
+  }
+}
