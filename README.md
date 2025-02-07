@@ -12,6 +12,13 @@ A simple Node.js command-line tool to scrape top and newest stories from [Hacker
 
 ---
 
+## Install
+
+```bash
+npm i -g  hackernews-scraper-cli
+```
+
+
 ## Install with source
 
 1. Clone the repository:
