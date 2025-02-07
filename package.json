@@ -2,9 +2,9 @@
   "name": "hackernews-scraper-cli",
   "version": "0.0.2",
   "description": "A command-line tool to scrape Hacker News top and newest stories",
- "main": "src/HackNewsService.js",
+  "main": "src/HackNewsService.js",
   "bin": {
-    "hackernews": "./bin/hackernews.js"
+    "hackernews": "bin/hackernews.js"
   },
   "scripts": {
     "start": "node ./bin/hackernews.js"
