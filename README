@@ -1,5 +1,3 @@
-Here's the README in **pure markdown** format:
-
 ---
 
 # HackerNews CLI
@@ -19,8 +17,8 @@ A simple Node.js command-line tool to scrape top and newest stories from [Hacker
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/hackernews-cli.git
-   cd hackernews-cli
+   git clone https://github.com/AtomGradient/hackernews-scraper
+   cd hackernews-scraper
    ```
 
 2. Install dependencies:
