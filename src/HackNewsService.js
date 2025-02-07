@@ -2,95 +2,101 @@ const puppeteer = require('puppeteer');
 
 class HackNewsService {
     async hNewsTopList(data) {
-        const browser = await puppeteer.launch({ headless: "new" });
+        const browser = await puppeteer.launch({
+            headless: "new", args: [
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--disable-setuid-sandbox',
+                '--no-first-run',
+                '--no-sandbox',
+                '--no-zygote',
+                '--single-process',
+            ]
+        });
         const page = await browser.newPage();
         let url = 'https://news.ycombinator.com/news';
-        if (data && data.p && Number(data.p) > 1) {
-            url = `https://news.ycombinator.com/news?p=${data.p}`;
+        if (data && data.hasOwnProperty('p')) {
+            if (Number(data.p) > 1) url = `https://news.ycombinator.com/news?p=${data.p}`
         }
-        // console.log("Scraping from:", url);
+        // console.log("We are scraping from " + url);
         await page.goto(url);
         try {
             await page.waitForSelector('.titleline');
-            const articles = await page.evaluate(() => {
-                return Array.from(document.querySelectorAll('.athing')).map(article => {
+            const specificClassSpanContents = await page.evaluate(() => {
+                const articles = Array.from(document.querySelectorAll('.athing'));
+                if (!articles) return [];
+                return articles.map(article => {
                     const titleLine = article.querySelector('.titleline');
                     const subline = article.nextElementSibling.querySelector('.subline');
-                    const title = titleLine ? titleLine.textContent.trim() : 'No title';
-                    const link = titleLine && titleLine.querySelector('a') ? titleLine.querySelector('a').href : 'No link';
-                    const points = subline?.querySelector('.score')?.textContent.match(/\d+/)?.[0] || 0;
-                    const commentsLink = Array.from(subline.querySelectorAll('a')).find(a => a.textContent.includes('comment'));
-                    const comments = commentsLink ? parseInt(commentsLink.textContent.match(/\d+/)?.[0] || 0) : 0;
-                    const commentsHref = commentsLink ? commentsLink.href : null;
-
-                    return { title, link, points: Number(points), comments, commentsHref };
-                });
+                    if (!titleLine) return null;
+                    const title = titleLine.textContent.trim();
+                    const link = titleLine.querySelector('a') ? titleLine.querySelector('a').getAttribute('href') : 'No link';
+                    if (!subline) return { title: title, link: link, points: 0, comments: 0, commentsHref: false };
+                    const pointsElement = subline.querySelector('.score');
+                    const points = pointsElement ? parseInt(pointsElement.textContent.trim().replace(/\D/g, ''), 10) : 0;
+                    const commentsLink = Array.from(subline.querySelectorAll('a[href*="item?id="]')).find(a => a.textContent.includes('comments'));
+                    const comments = commentsLink ? parseInt(commentsLink.textContent.trim().replace(/\D/g, ''), 10) : 0;
+                    const commentsHref = commentsLink ? commentsLink.getAttribute('href') : false;
+                    return { title: title, link: link, points: Number(points), comments: Number(comments), commentsHref: commentsHref };
+                }).filter(item => item !== null);
             });
+    
             await browser.close();
-            return articles;
+            return specificClassSpanContents;
         } catch (error) {
-            console.error("Error:", error.message);
-            await browser.close();
+            console.error("An error occurred, will retry,", error.message);
             return [];
         }
     }
 
     async hNewsNewestList(data) {
         const browser = await puppeteer.launch({
-            headless: "new",
-            args: [
-                '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox',
-                '--no-first-run', '--no-sandbox', '--no-zygote', '--single-process',
+            headless: "new", args: [
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--disable-setuid-sandbox',
+                '--no-first-run',
+                '--no-sandbox',
+                '--no-zygote',
+                '--single-process',
             ]
         });
-
         const page = await browser.newPage();
         let url = 'https://news.ycombinator.com/newest';
-        let index = data.index || 1;  // Default to 1 if index isn't provided
-
-        // If nextPage token is provided, modify the URL
-        if (data.nextPage) {
-            url = `https://news.ycombinator.com/${data.nextPage}`;
+        let index = 0;
+        if (data && data.hasOwnProperty('p')) {
+            if (data.p) url = `https://news.ycombinator.com/${data.p}`
         }
-
-        // console.log(`Scraping from: ${url} (Page ${index})`);
-
+        if (data && data.hasOwnProperty('index')) {
+            if (Number(data.index) > 10) return { message: 'will end now' }
+            index = Number(data.index) + 1;
+        }
+        else {
+            index += 1;
+        }
+        // console.log("We are scraping from " + url + ":" + 'index==' + index);
         try {
             await page.goto(url);
+            console.log(`with page index = ${index}`);
             await page.waitForSelector('.morelink');
-
-            // Extract the articles
-            const articles = await page.evaluate(() => {
-                return Array.from(document.querySelectorAll('.athing')).map(article => {
-                    const titleLine = article.querySelector('.titleline');
-                    const subline = article.nextElementSibling.querySelector('.subline');
-                    const title = titleLine ? titleLine.textContent.trim() : 'No title';
-                    const link = titleLine?.querySelector('a')?.href || 'No link';
-                    const points = subline?.querySelector('.score')?.textContent.match(/\d+/)?.[0] || 0;
-                    const commentsLink = Array.from(subline.querySelectorAll('a')).find(a => a.textContent.includes('comment'));
-                    const comments = commentsLink ? parseInt(commentsLink.textContent.match(/\d+/)?.[0] || 0) : 0;
-                    const commentsHref = commentsLink ? commentsLink.href : null;
-
-                    return { title, link, points: Number(points), comments, commentsHref };
-                });
+            const moreLinkStr = await page.$eval('.morelink', el => el.getAttribute('href'));
+            // console.log(moreLinkStr);// newest?next=38877115&n=31
+            const specificClassSpanContents = await page.evaluate(() => {
+                const spans = Array.from(document.querySelectorAll('.titleline'));
+                if (!spans) return [];
+                return spans.map(span => ({ 'title': span.textContent, link: span.querySelector('a').getAttribute('href') }));
             });
-
-            // Get the next page token
-            const nextPageToken = await page.$eval('.morelink', el => el.getAttribute('href'));
-
             await browser.close();
-
-            // Return articles along with the nextPage token and index
-            return {
-                articles,
-                nextPage: nextPageToken,
-                index: index + 1
-            };
-
+            let interpolation = {
+                p: moreLinkStr,
+                index: index,
+                type: 'next'
+            }
+            specificClassSpanContents.push(interpolation);
+            return specificClassSpanContents;
         } catch (error) {
-            console.error("An error occurred:", error.message);
-            await browser.close();
-            return { articles: [], nextPage: null, index };
+            console.error("An error occurred, will retry,", error.message);
+            return []
         }
     }
 }
