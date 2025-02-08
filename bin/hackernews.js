@@ -6,7 +6,7 @@ const HackNewsService = require('../src/HackNewsService');
 program
     .name('hackernews')
     .description('CLI tool to scrape Hacker News top stories and newest posts')
-    .version('0.0.5');
+    .version('0.0.6');
 
 program
     .command('top')
@@ -26,5 +26,15 @@ program
         const data = await HackNewsService.hNewsNewestList({ nextPage: options.nextPage, index: Number(options.index) });
         console.log(JSON.stringify(data, null, 2));
     });
+
+program
+.command('comments')
+.description('Fetch comments for a specific Hacker News story')
+.requiredOption('--commentsHref <href>', 'Relative URL to the comments page, e.g., "item?id=42971811"')
+.action(async (options) => {
+    const data = { commentsHref: options.commentsHref };
+    const result = await HackNewsService.hackerNewsComments(data);
+    console.log(JSON.stringify(result, null, 2));
+});    
 
 program.parse(process.argv);

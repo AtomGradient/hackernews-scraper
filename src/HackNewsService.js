@@ -99,6 +99,48 @@ class HackNewsService {
             return []
         }
     }
+
+    async hackerNewsComnents(data) {
+        if (!data.hasOwnProperty('commentsHref')) return [];
+        const browser = await puppeteer.launch({
+            headless: "new",
+        });
+        const page = await browser.newPage();
+        await page.goto(`https://news.ycombinator.com/${data.commentsHref}`);
+        const comments = await page.evaluate(() => {
+            const rows = Array.from(document.querySelectorAll('.comtr'));
+            let comments = [];
+            let stack = [comments];
+            rows.forEach(row => {
+                const author = row.querySelector('.hnuser')?.innerText;
+                const time = row.querySelector('.age a')?.innerText;
+                let commentTextElement = row.querySelector('.commtext');
+                let commentText = commentTextElement?.innerText.replace(/\s\s+/g, ' ').trim() || "comments deleted";    
+                let links = commentTextElement?.querySelectorAll('a');
+                links?.forEach(link => {
+                    const href = link.href;
+                    const linkText = link.innerText;
+                    commentText = commentText.replace(linkText, `(${href})`);
+                });
+    
+                const indentLevel = parseInt(row.querySelector('.ind img')?.width / 40, 10);
+                const comment = { author, time, commentText, replies: [] };
+                while (indentLevel < stack.length - 1) {
+                    stack.pop();
+                }
+                if (indentLevel === stack.length - 1) {
+                    stack[indentLevel].push(comment);
+                    stack.push(comment.replies);
+                } else {
+                    console.error('Indentation error', { comment, indentLevel, stackLength: stack.length });
+                }
+            });
+    
+            return comments;
+        });
+        await browser.close();
+        return comments;
+    }
 }
 
 module.exports = new HackNewsService();
