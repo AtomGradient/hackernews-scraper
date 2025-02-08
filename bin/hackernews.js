@@ -6,7 +6,7 @@ const HackNewsService = require('../src/HackNewsService');
 program
     .name('hackernews')
     .description('CLI tool to scrape Hacker News top stories and newest posts')
-    .version('0.0.2');
+    .version('0.0.5');
 
 program
     .command('top')
