@@ -44,7 +44,7 @@ npm i -g  hackernews-scraper-cli
 
 ## Usage
 
-### Fetch Top Stories
+### 1. **Fetch Top Stories**
 
 Fetch the first page of top stories:
 
@@ -60,7 +60,7 @@ hackernews top --page 2
 
 ---
 
-### Fetch Newest Stories
+### 2. **Fetch Newest Stories**
 
 Fetch the first page of newest stories:
 
@@ -84,6 +84,53 @@ hackernews newest
   "nextPage": "newest?next=42972516&n=31",
   "index": 2
 }
+```
+
+---
+
+
+### 3. **Fetch Comments for a Story**
+
+Retrieve comments for a specific Hacker News story.
+
+```bash
+hackernews comments --commentsHref <href>
+```
+
+**Options:**
+
+- `--commentsHref <href>`: The relative URL for the comments page (e.g., `item?id=42971811`). You can get this from the output of the `top` or `newest` commands.
+
+**Example:**
+
+```bash
+hackernews comments --commentsHref "item?id=42971811"
+```
+
+**Example Output:**
+
+```json
+[
+  {
+    "author": "alice123",
+    "time": "2 hours ago",
+    "commentText": "This is a fascinating development in AI!",
+    "replies": [
+      {
+        "author": "bob456",
+        "time": "1 hour ago",
+        "commentText": "I agree! Have you read the paper? (https://example.com/paper)",
+        "replies": []
+      }
+    ]
+  },
+  {
+    "author": "charlie789",
+    "time": "30 minutes ago",
+    "commentText": "I think there are still some ethical concerns to address.",
+    "replies": []
+  }
+]
 ```
 
 ---
@@ -116,7 +163,9 @@ Repeat this process using the new `nextPage` token returned in each response.
 | `--page <number>`     | (Optional) Specify the page number for top stories|
 | `hackernews newest`   | Fetch newest stories from Hacker News            |
 | `--nextPage <token>`  | (Optional) Use the token to fetch next newest page|
-| `--index <number>`    | (Optional) Specify the index of the page          |
+| `--index <number>`    | (Optional) Specify the index of the page(NO NEED) |
+| `hackernews comments` | Fetch comments of some  Hacker News item          |
+| `--commentsHref <href>`|Specify the comments tag of some Hacker News item|
 
 ---
 
