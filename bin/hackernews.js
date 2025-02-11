@@ -35,6 +35,14 @@ program
     const data = { commentsHref: options.commentsHref };
     const result = await HackNewsService.hackerNewsComnents(data);
     console.log(JSON.stringify(result, null, 2));
-});    
+}); 
+
+program
+    .command('raw <url>')
+    .description('Fetch raw content from a web URL')
+    .action(async (url) => {
+        const result = await HackNewsService.webRawContent(url);
+        console.log(JSON.stringify(result, null, 2));
+    });
 
 program.parse(process.argv);
