@@ -69,8 +69,8 @@ hackernews comments --commentsHref "item?id=42971811"
 # Fetch article content
 hackernews raw https://arxiv.org/abs/2502.06788
 
-# Use system browser (macOS only)
-hackernews raw https://example.com --default-browser
+# Use system browser (macOS only),some web page do not support `puppeteer`, so we should use system browser instead
+hackernews raw https://conhecimentohoje.blogs.sapo.pt/trumps-bold-move-a-bitcoin-etf-that-98774 --default-browser
 ```
 
 ## 📋 Command Reference
