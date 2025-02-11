@@ -141,6 +141,52 @@ class HackNewsService {
         await browser.close();
         return comments;
     }
+
+
+    async webRawContent(fileURL,isHeadless="new"){
+        const browser = await puppeteer.launch({
+            headless: isHeadless,
+            args: [
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--disable-setuid-sandbox',
+                '--no-first-run',
+                '--no-sandbox',
+                '--no-zygote',
+                '--single-process',
+            ]
+            // executablePath:"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        });
+        let webDetail = {
+            content:"",
+            keywords:"",
+            summary:"",
+            top_image:""
+        }
+        try {
+            const page = (await browser.pages())[0];
+            // await page.setUserAgent(this.randomUAHeader()); // No randomUAHeader function in the provided code. Removed it.
+            await page.goto(fileURL);
+            const extractedText = await page.$eval('*', (el) => el.innerText);
+            webDetail.content   = extractedText;
+            return webDetail;
+        } catch (error) {
+            console.error("An error occurred, will use no headless browser,", error.message, fileURL, JSON.stringify(webDetail));
+            if(webDetail.content.length > 100)
+            {
+                console.error(`Already fetch the Content, will return`,fileURL);
+                return webDetail;
+            }
+            if(!isHeadless)
+            {
+                console.error(`use no headless browser also get no content!!!`, error.message, fileURL);
+                return webDetail;
+            }
+            return await this.webPage2Text1(fileURL,false);
+        }finally{
+            await browser.close();
+        }
+    }
 }
 
 module.exports = new HackNewsService();
