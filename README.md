@@ -125,7 +125,7 @@ hackernews raw https://example.com --default-browser
 Want to contribute? Great! Here's how to modify the CLI:
 
 1. Modify `src/HackNewsService.js` for scraping logic
-2. Update `index.js` for CLI commands
+2. Update `hackernews.js` for CLI commands
 3. Re-link the CLI:
    ```bash
    npm unlink -g
