@@ -135,6 +135,33 @@ hackernews comments --commentsHref "item?id=42971811"
 
 ---
 
+
+### 4. **Fetch URL Raw Content**
+
+Fetch the given url's web raw content, for example, you can use it for LLM summarizing:
+
+```bash
+hackernews raw https://arxiv.org/abs/2502.06788
+```
+
+**Example Output:**
+
+```json
+{
+  "content": "Skip to main content\nWe gratefully acknowledge support from the Simons Foundation, member institutions, and all contributors.\nDonate\n>\ncs\n>\narXiv:2502.06788\n\nHelp | Advanced Search\n\nAll fields\nTitle\nAuthor\nAbstract\nComments\nJournal reference\nACM classification\nMSC classification\nReport number\narXiv identifier\nDOI\nORCID\narXiv author ID\nHelp pages\nFull text\nSearch\nComputer Science > Computer Vision and Pattern Recognition\n[Submitted on 10 Feb 2025]\nEVEv2: Improved Baselines for Encoder-Free Vision-Language Models\nHaiwen Diao, Xiaotong Li, Yufeng Cui, Yueze Wang, Haoge Deng, Ting Pan, Wenxuan Wang, Huchuan Lu, Xinlong Wang\nExisting encoder-free vision-language models (VLMs) are rapidly narrowing the performance gap with their encoder-based counterparts, highlighting the promising potential for unified multimodal systems with structural simplicity and efficient deployment. We systematically clarify the performance gap between VLMs using pre-trained vision encoders, discrete tokenizers, and minimalist visual layers from scratch, deeply excavating the under-examined characteristics of encoder-free VLMs. We develop efficient strategies for encoder-free VLMs that rival mainstream encoder-based ones. After an in-depth investigation, we launch EVEv2.0, a new and improved family of encoder-free VLMs. We show that: (i) Properly decomposing and hierarchically associating vision and language within a unified model reduces interference between modalities. (ii) A well-designed training strategy enables effective optimization for encoder-free VLMs. Through extensive evaluation, our EVEv2.0 represents a thorough study for developing a decoder-only architecture across modalities, demonstrating superior data efficiency and strong vision-reasoning capability. Code is publicly available at: this https URL.\nComments:\t19 pages, 9 figures\nSubjects:\tComputer Vision and Pattern Recognition (cs.CV); Artificial Intelligence (cs.AI)\nCite as:\tarXiv:2502.06788 [cs.CV]\n \t(or arXiv:2502.06788v1 [cs.CV] for this version)\n \t\nhttps://doi.org/10.48550/arXiv.2502.06788\nFocus to learn more\nSubmission history\nFrom: Haiwen Diao [view email]\n[v1] Mon, 10 Feb 2025 18:59:58 UTC (2,441 KB)\n\nAccess Paper:\nView PDF\nHTML (experimental)\nTeX Source\nOther Formats\nview license\nCurrent browse context:\ncs.CV\n< prev   |   next >\n\nnew | recent | 2025-02\nChange to browse by:\ncs\ncs.AI\n\nReferences & Citations\nNASA ADS\nGoogle Scholar\nSemantic Scholar\nExport BibTeX Citation\nBookmark\n \nBibliographic Tools\nBibliographic and Citation Tools\nBibliographic Explorer Toggle\nBibliographic Explorer (What is the Explorer?)\nConnected Papers Toggle\nConnected Papers (What is Connected Papers?)\nLitmaps Toggle\nLitmaps (What is Litmaps?)\nscite.ai Toggle\nscite Smart Citations (What are Smart Citations?)\nCode, Data, Media\nDemos\nRelated Papers\nAbout arXivLabs\nWhich authors of this paper are endorsers? | Disable MathJax (What is MathJax?)\nAbout\nHelp\nContact\nSubscribe\nCopyright\nPrivacy Policy\nWeb Accessibility Assistance\n\narXiv Operational Status \nGet status notifications via email or slack",
+  "keywords": "",
+  "summary": "",
+  "top_image": ""
+}
+```
+you can alse use the `--default-browser` flag to use your own web browser, cause some websites do not support puppeteer's web browser.
+```bash
+# currently, `--default-browser` only works on macOS.
+hackernews raw https://conhecimentohoje.blogs.sapo.pt/trumps-bold-move-a-bitcoin-etf-that-98774 --default-browser
+```
+---
+
+
 ### Pagination with Newest Stories
 
 After fetching the first page, use the `nextPage` token from the output to fetch subsequent pages.
