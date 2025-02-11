@@ -171,8 +171,6 @@ class HackNewsService {
         }
         try {
             const page = (await browser.pages())[0];
-            page.setDefaultTimeout(30000);
-            page.setDefaultNavigationTimeout(30000);
             if (!useDefaultBrowser) await page.setUserAgent(this.randomUAHeader());
             await page.goto(fileURL);
             const extractedText = await page.$eval('*', (el) => el.innerText);
