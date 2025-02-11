@@ -143,8 +143,8 @@ class HackNewsService {
     }
 
 
-    async webRawContent(fileURL,isHeadless="new"){
-        const browser = await puppeteer.launch({
+    async webRawContent(fileURL, isHeadless = "new", useDefaultBrowser = false){
+        const launchOptions = {
             headless: isHeadless,
             args: [
                 '--disable-gpu',
@@ -155,8 +155,14 @@ class HackNewsService {
                 '--no-zygote',
                 '--single-process',
             ]
-            // executablePath:"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-        });
+        };
+
+        if (useDefaultBrowser) {
+            launchOptions.executablePath = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+        }
+
+        const browser = await puppeteer.launch(launchOptions);
+
         let webDetail = {
             content:"",
             keywords:"",
@@ -165,28 +171,47 @@ class HackNewsService {
         }
         try {
             const page = (await browser.pages())[0];
-            // await page.setUserAgent(this.randomUAHeader()); // No randomUAHeader function in the provided code. Removed it.
+            page.setDefaultTimeout(30000);
+            page.setDefaultNavigationTimeout(30000);
+            if (!useDefaultBrowser) await page.setUserAgent(this.randomUAHeader());
             await page.goto(fileURL);
             const extractedText = await page.$eval('*', (el) => el.innerText);
             webDetail.content   = extractedText;
             return webDetail;
         } catch (error) {
-            console.error("An error occurred, will use no headless browser,", error.message, fileURL, JSON.stringify(webDetail));
+            console.error("An error occurred, will use no headless browser,\n", error.message, fileURL, JSON.stringify(webDetail));
             if(webDetail.content.length > 100)
             {
-                console.error(`Already fetch the Content, will return`,fileURL);
+                console.error(`Already fetch the Content, will return\n`,fileURL);
                 return webDetail;
             }
             if(!isHeadless)
             {
-                console.error(`use no headless browser also get no content!!!`, error.message, fileURL);
+                console.error(`use no headless browser also get no content!!!\n`, error.message, fileURL);
                 return webDetail;
             }
-            return await this.webPage2Text1(fileURL,false);
+            return await this.webRawContent(fileURL,false,useDefaultBrowser);
         }finally{
             await browser.close();
         }
     }
+
+    randomUAHeader() {
+        const userAgents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Linux; Android 8.0.0; SM-G965U Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.111 Mobile Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'
+        ];
+        const ua = userAgents[Math.floor(Math.random() * userAgents.length)];
+        return ua;
+    } 
 }
 
 module.exports = new HackNewsService();

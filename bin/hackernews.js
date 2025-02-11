@@ -40,8 +40,10 @@ program
 program
     .command('raw <url>')
     .description('Fetch raw content from a web URL')
-    .action(async (url) => {
-        const result = await HackNewsService.webRawContent(url);
+    .option('--default-browser', 'Use the default browser executable path')
+    .action(async (url, options) => {
+        const useDefaultBrowser = options.defaultBrowser || false;
+        const result = await HackNewsService.webRawContent(url, "new", useDefaultBrowser);
         console.log(JSON.stringify(result, null, 2));
     });
 
